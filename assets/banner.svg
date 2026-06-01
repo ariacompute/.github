@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1986" height="792" viewBox="0 0 1986 792" role="img" aria-label="Aria Compute">
   <title>Aria Compute</title>
-  <rect width="1986" height="792" fill="#11110f" />
   <text
     x="993"
     y="396"
-    fill="#f7f4ec"
+    fill="#000000"
     font-family="'Helvetica Neue', 'Arial', 'Liberation Sans', sans-serif"
     font-size="288"
     font-weight="700"
