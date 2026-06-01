@@ -1,16 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1380" height="278.666687" viewBox="0 0 1380 278.666687" role="img" aria-label="/aria.compute">
-  <title>/aria.compute</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1986" height="792" viewBox="0 0 1986 792" role="img" aria-label="Aria Compute">
+  <title>Aria Compute</title>
+  <rect width="1986" height="792" fill="#11110f" />
   <text
-    x="690"
-    y="159.635414"
-    fill="#000"
-    font-family="'IBM Plex Mono', 'JetBrains Mono', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace"
-    font-size="238"
+    x="993"
+    y="396"
+    fill="#f7f4ec"
+    font-family="'Helvetica Neue', 'Arial', 'Liberation Sans', sans-serif"
+    font-size="288"
     font-weight="700"
     letter-spacing="-0.04em"
     text-anchor="middle"
     dominant-baseline="middle"
     lengthAdjust="spacingAndGlyphs"
-    textLength="1380"
+    textLength="1540"
   >/aria.compute</text>
 </svg>
