@@ -1,0 +1,114 @@
+<svg width="1260" height="800" viewBox="0 0 1260 800" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft YaHei, 微软雅黑, sans-serif">
+  <defs>
+    <marker orient="auto" markerHeight="7" markerWidth="7" refY="5" refX="9" viewBox="0 0 10 10" id="arrow">
+      <path fill="#F03560" d="M0 0 L10 5 L0 10 Z"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1260" height="800" fill="#0D0D0D"/>
+
+  <!-- 内容块垂直居中：内容约 y=20..696（高 676），画布 800 → 上下各留 62，相对原布局下移 42 -->
+  <g transform="translate(-10, 45)">
+
+  <!-- ========== 应用层（对齐主栈中心 x=540；文字在组件内水平+垂直居中） ========== -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="62" width="380" y="14" x="350"/>
+  <text font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="36" x="540">应用层</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="58" x="540">客户 App · 机器人 · 具身栈</text>
+
+  <!-- App → 四个组件：竖干 + 横向母线 + 四路下落 -->
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M540 76 V112"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M171 112 H909"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" marker-end="url(#arrow)" d="M171 112 V154"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" marker-end="url(#arrow)" d="M417 112 V154"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" marker-end="url(#arrow)" d="M663 112 V154"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" marker-end="url(#arrow)" d="M909 112 V154"/>
+
+  <!-- ========== 可组合开源组件层（四列：Model / Engine / Router / Memo） ========== -->
+  <text font-size="10" fill="#6B6B6B" y="144" x="60">可组合开源组件层</text>
+
+  <!-- Aria Model：卡片 x=60..282，中心 x=171 -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="150" width="222" y="156" x="60"/>
+  <text font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="206" x="171">Aria Model</text>
+  <rect fill="#F03560" rx="9" height="18" width="40" y="224" x="151"/>
+  <text font-weight="bold" font-size="9" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="233" x="171">开源</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="262" x="171">多模态 · VLA（具身智能）</text>
+
+  <!-- Aria Engine：卡片 x=306..528，中心 x=417 -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="150" width="222" y="156" x="306"/>
+  <text font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="206" x="417">Aria Engine</text>
+  <rect fill="#F03560" rx="9" height="18" width="40" y="224" x="397"/>
+  <text font-weight="bold" font-size="9" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="233" x="417">开源</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="262" x="417">端侧推理运行时</text>
+
+  <!-- Aria Router：卡片 x=552..774，中心 x=663（推理网关：Semantic + Agent 双路由） -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="150" width="222" y="156" x="552"/>
+  <text font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="206" x="663">Aria Router</text>
+  <rect fill="#F03560" rx="9" height="18" width="40" y="224" x="643"/>
+  <text font-weight="bold" font-size="9" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="233" x="663">开源</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="262" x="663">Semantic + Agent 网关</text>
+
+  <!-- Aria Memo：卡片 x=798..1020，中心 x=909 -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="150" width="222" y="156" x="798"/>
+  <text font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="206" x="909">Aria Memo</text>
+  <rect fill="#F03560" rx="9" height="18" width="40" y="224" x="889"/>
+  <text font-weight="bold" font-size="9" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="233" x="909">开源</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="262" x="909">端侧 Agent 长期记忆</text>
+
+  <!-- Model / Engine 竖线穿过 Pin（训练箭头已移除） -->
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M171 306 V384"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M417 306 V384"/>
+  <!-- Router / Memo 竖直穿过 Pin（y=386..486）的中段隐藏 -->
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M663 306 V384"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M909 306 V384"/>
+
+  <!-- ========== 训练生态层 ========== -->
+  <text font-size="10" fill="#6B6B6B" y="374" x="60">训练生态层</text>
+
+  <!-- Aria Pin（横贯主栈；文字在组件内居中） -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="100" width="960" y="386" x="60"/>
+  <text font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="418" x="540">Aria Pin</text>
+  <text font-size="12" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="450" x="540">LoRA+RL · 垂直场景训练</text>
+
+  <!-- ========== Aria Registry：文字在竖直方框内水平+垂直居中 ========== -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="540" width="120" y="156" x="1100"/>
+  <text font-weight="bold" font-size="18" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="370" x="1160">Aria</text>
+  <text font-weight="bold" font-size="18" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="398" x="1160">Registry</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="440" x="1160">发布分享</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="466" x="1160">Aria</text>
+  <text font-size="11" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="490" x="1160">Model</text>
+
+  <!-- Registry → Pin（分发）；线段 x=1022..1100，文字框在线上方 -->
+  <path stroke="#F03560" fill="none" stroke-width="2" marker-end="url(#arrow)" d="M1100 436 H1022"/>
+  <rect fill="#F03560" rx="10" height="20" width="40" y="406" x="1040"/>
+  <text font-weight="bold" font-size="9" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="416" x="1060">分发</text>
+
+  <!-- ========== 部署域母线（y=526）：四路组件汇入，端侧实线 / 云端虚线 ========== -->
+  <text font-size="10" fill="#6B6B6B" y="554" x="60">部署域</text>
+
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M171 486 V526"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M417 486 V526"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M663 486 V526"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M909 486 V526"/>
+  <path stroke="#F03560" fill="none" stroke-width="2" d="M171 526 H909"/>
+
+  <!-- 母线 → 端侧（简单任务走端侧） -->
+  <path stroke="#F03560" fill="none" stroke-width="2" marker-end="url(#arrow)" d="M300 526 V564"/>
+
+  <!-- 母线 → 云端（复杂任务，虚线） -->
+  <path stroke="#F03560" stroke-dasharray="6,4" stroke-width="1.5" fill="none" marker-end="url(#arrow)" d="M800 526 V564"/>
+  <rect fill="#F03560" rx="11" height="22" width="60" y="496" x="770"/>
+  <text font-weight="bold" font-size="9" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="507" x="800">复杂任务</text>
+
+  <!-- 端侧 -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="130" width="480" y="566" x="60"/>
+  <text font-weight="bold" font-size="22" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="616" x="300">端侧</text>
+  <text font-size="13" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="648" x="300">手机 · 机器人 · 眼镜</text>
+
+  <!-- 云端 -->
+  <rect stroke-width="2" stroke="#F03560" fill="#1A1A1A" rx="8" height="130" width="440" y="566" x="580"/>
+  <text font-weight="bold" font-size="22" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle" y="616" x="800">云端</text>
+  <text font-size="13" fill="#A3A3A3" text-anchor="middle" dominant-baseline="middle" y="648" x="800">混合云协同 · 托管服务</text>
+
+  </g>
+</svg>

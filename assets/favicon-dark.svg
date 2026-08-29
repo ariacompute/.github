@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1 1 62 62" role="img" aria-label="Aria Compute">
+  <rect x="1" y="1" width="62" height="62" rx="18" fill="#f7f4ec" />
+  <g fill="none" stroke="#11110f" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 53 23 11" stroke-width="8" />
+    <circle cx="41" cy="37" r="11" stroke-width="6" />
+    <path d="M51 54V27" stroke-width="6" />
+  </g>
+</svg>
