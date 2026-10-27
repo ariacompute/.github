@@ -1,3 +1,3 @@
 <p align="center">
-  <img src="../assets/banner.png" alt="aria compute banner" width="100%">
+  <img src="./architecture.svg" alt="Aria Compute technology stack — animated data flow from touchpoints through orchestration, agent runtime and inference routing to models and training" width="100%">
 </p>
