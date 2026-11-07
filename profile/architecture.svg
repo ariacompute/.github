@@ -3,7 +3,7 @@
      aria-labelledby="svg-title svg-desc" shape-rendering="geometricPrecision"
      font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
   <title id="svg-title">Aria Compute — technology stack and data flows</title>
-  <desc id="svg-desc">Five-stage architecture map of Aria Compute with 15 modules and five animated data flows. Touchpoints: agentbuddy (Tauri v2 desktop) submits A2A tasks to agenthub. Orchestration: agenthub (A2A hub, port 3500) persists task state in PostgreSQL and dispatches to agent/cloud; mcpx (MCP gateway, port 8848) publishes any HTTP service as MCP tools. Agent runtime: agent/cloud (port 3000, SSE) hosts the agent/core recall-model-memorize loop, which reads and writes memo (on-device SQLite FTS5) and calls gateway over HTTPS; agent/cloud keeps context in PostgreSQL plus pgvector. Inference and routing: router (port 8899) sends System One decisions to engine (port 8011, /v1/systemone) or the ollaya-compatible daemon (port 11435) and forwards completions to external LLMs; gateway (Bifrost behind Caddy, 443) also proxies to LLMs. Models and training: model weights load into engine and ollaya, pin (port 8001) post-trains checkpoints, exports to engine and reports metrics to mlflow (port 5000). A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE and MLflow runs. Five flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, and train / export / serve.</desc>
+  <desc id="svg-desc">Six-stage architecture map of Aria Compute with 16 modules, two external services and six animated data flows. Touchpoints: agentbuddy (Tauri v2 desktop) submits A2A tasks to agenthub. Orchestration: agenthub (A2A hub, port 3500) persists task state in PostgreSQL and dispatches to agent/cloud; mcpx (MCP gateway, port 8848) publishes any HTTP service as MCP tools. Agent runtime: agent/cloud (port 3000, SSE) hosts the agent/core recall-model-memorize loop, which reads and writes memo (on-device SQLite FTS5) and calls gateway over HTTPS; agent/cloud keeps context in PostgreSQL plus pgvector. Inference and routing: router (port 8899) sends System One decisions to engine (port 8011, /v1/systemone) or the ollaya-compatible daemon (port 11435) and forwards completions to external LLMs; gateway (Bifrost behind Caddy, 443) also proxies to LLMs. Models and training: model weights load into engine and ollaya, pin (port 8001) post-trains checkpoints, exports to engine and reports metrics to mlflow (port 5000). Knowledge plane: agentmem (Go, port 8080) is a knowledge hub for AI agents; agent/core calls /v1/knowledge and /v1/query, a rules-first smart router (R1-R7) sends only ambiguous choices to AFM-D System One with a fail-closed fallback to OKF, OKF + Git holds the only canonical knowledge bodies linked by content_hash + commit_sha, RAG adapters hold rebuildable projections, and Attested Computations turn sanctioned SQL into audited verdicts. A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE, MLflow runs and OKF + Git bodies. Six flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, knowledge plane, and train / export / serve.</desc>
 
   <defs>
     <style>
@@ -13,8 +13,8 @@
       .edge{fill:none;stroke:#2A2A2A;stroke-width:1.05;marker-end:url(#arr)}
       .edge.sse{stroke-dasharray:4 4}
       .edge.sql{stroke:#3E3E3E;stroke-dasharray:1.5 4;stroke-linecap:round}
-      .scene{opacity:0;animation:flow 40s linear infinite both}
-      @keyframes flow{0%{opacity:1}20%{opacity:1}24%{opacity:0}100%{opacity:0}}
+      .scene{opacity:0;animation:flow 48s linear infinite both}
+      @keyframes flow{0%{opacity:1}16.6%{opacity:1}20.8%{opacity:0}100%{opacity:0}}
       .halo{fill:none;stroke:#FFF;stroke-opacity:.075;stroke-width:8;marker-end:none}
       .lit{fill:none;stroke:#FFF;stroke-width:1.75;marker-end:url(#arr-lit)}
       .lit.sse{stroke-dasharray:4 4}
@@ -92,9 +92,9 @@
     <path id="e08" class="edge     " data-from="agent/core" data-to="memo" data-kind="local" data-scene="memory" d="M512 316V336"/>
     <path id="e10" class="edge     " data-from="agent/core" data-to="mcpx" data-kind="mcp" data-scene="mcp" d="M432 284H392"/>
     <path id="e15" class="edge     " data-from="mcpx" data-to="http-services" data-kind="http" data-scene="mcp" d="M312 316V336"/>
-    <path id="e18" class="edge sql " data-from="agent/cloud" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M432 218H420V654"/>
-    <path id="e19" class="edge sql " data-from="memo" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M512 400V654"/>
-    <path id="e20" class="edge sql " data-from="mlflow" data-to="state-substrate" data-kind="sql" data-scene="train" d="M912 568V654"/>
+    <path id="e18" class="edge sql " data-from="agent/cloud" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M432 218H404V654"/>
+    <path id="e19" class="edge sql " data-from="memo" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M592 384H620V654"/>
+    <path id="e20" class="edge sql " data-from="mlflow" data-to="state-substrate" data-kind="sql" data-scene="train" d="M912 568H860V654"/>
     <path id="e21" class="edge     " data-from="model" data-to="pin" data-kind="checkpoint" data-scene="train" d="M912 400V420"/>
     <path id="e22" class="edge     " data-from="pin" data-to="mlflow" data-kind="metrics" data-scene="train" d="M912 484V504"/>
     <path id="e23" class="edge     " data-from="pin" data-to="engine" data-kind="export" data-scene="train" d="M832 452H816V216H832"/>
@@ -104,6 +104,13 @@
     <path id="e27" class="edge     " data-from="model" data-to="engine" data-kind="weights" data-scene="train" d="M992 368H1002V200H992"/>
     <path id="e28" class="edge     " data-from="model" data-to="ollaya" data-kind="weights" data-scene="train" d="M912 336V316"/>
     <path id="e29" class="edge     " data-from="router" data-to="llms" data-kind="https" data-scene="decision" d="M632 218H610V368H632"/>
+    <path id="e30" class="edge     " data-from="agent/core" data-to="agentmem" data-kind="http" data-scene="knowledge" d="M432 300H420V430H512V440"/>
+    <path id="e31" class="edge     " data-from="agentmem" data-to="okf-git" data-kind="canonical" data-scene="knowledge" d="M432 480H392"/>
+    <path id="e32" class="edge     " data-from="agentmem" data-to="rag-adapters" data-kind="projection" data-scene="knowledge" d="M592 480H632"/>
+    <path id="e33" class="edge sql " data-from="agentmem" data-to="state-substrate" data-kind="sql" data-scene="knowledge" d="M472 504H404V654"/>
+    <path id="e34" class="edge sql " data-from="rag-adapters" data-to="state-substrate" data-kind="sql" data-scene="knowledge" d="M792 488H804V654"/>
+    <path id="e35" class="edge     " data-from="agentmem" data-to="engine" data-kind="system-one" data-scene="knowledge" d="M592 440V430H824V220H832"/>
+    <path id="e36" class="edge sql " data-from="okf-git" data-to="state-substrate" data-kind="canonical" data-scene="knowledge" d="M312 504H204V580H944V654"/>
   </g>
 
   <!-- ============ flow scenes ============ -->
@@ -125,7 +132,7 @@
       <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-0.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e05" xlink:href="#e05"/></animateMotion></circle>
     </g>
 
-    <g class="scene" data-scene="decision" style="animation-delay:-32s">
+    <g class="scene" data-scene="decision" style="animation-delay:-40s">
       <use class="halo" href="#e03" xlink:href="#e03"/><use class="halo" href="#e06" xlink:href="#e06"/><use class="halo" href="#e07" xlink:href="#e07"/>
       <use class="halo" href="#e29" xlink:href="#e29"/>
       <use class="lit" href="#e03" xlink:href="#e03"/><use class="lit" href="#e06" xlink:href="#e06"/><use class="lit" href="#e07" xlink:href="#e07"/>
@@ -137,7 +144,7 @@
       <circle class="packet" r="3"><animateMotion dur="3.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e29" xlink:href="#e29"/></animateMotion></circle>
     </g>
 
-    <g class="scene" data-scene="memory" style="animation-delay:-24s">
+    <g class="scene" data-scene="memory" style="animation-delay:-32s">
       <use class="halo" href="#e08" xlink:href="#e08"/><use class="halo" href="#e18" xlink:href="#e18"/><use class="halo" href="#e19" xlink:href="#e19"/>
       <use class="halo" href="#e26" xlink:href="#e26"/>
       <use class="lit" href="#e08" xlink:href="#e08"/><use class="lit sql" href="#e18" xlink:href="#e18"/><use class="lit sql" href="#e19" xlink:href="#e19"/>
@@ -149,7 +156,7 @@
       <circle class="packet" r="3"><animateMotion dur="4.8s" begin="-1.2s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e26" xlink:href="#e26"/></animateMotion></circle>
     </g>
 
-    <g class="scene" data-scene="mcp" style="animation-delay:-16s">
+    <g class="scene" data-scene="mcp" style="animation-delay:-24s">
       <use class="halo" href="#e10" xlink:href="#e10"/><use class="halo" href="#e15" xlink:href="#e15"/>
       <use class="lit" href="#e10" xlink:href="#e10"/><use class="lit" href="#e15" xlink:href="#e15"/>
       <circle class="packet" r="3"><animateMotion dur="3.4s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e10" xlink:href="#e10"/></animateMotion></circle>
@@ -157,7 +164,7 @@
       <circle class="packet" r="3"><animateMotion dur="2.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e15" xlink:href="#e15"/></animateMotion></circle>
     </g>
 
-    <g class="scene" data-scene="train" style="animation-delay:-8s">
+    <g class="scene" data-scene="train" style="animation-delay:-16s">
       <use class="halo" href="#e20" xlink:href="#e20"/><use class="halo" href="#e21" xlink:href="#e21"/><use class="halo" href="#e22" xlink:href="#e22"/>
       <use class="halo" href="#e23" xlink:href="#e23"/><use class="halo" href="#e27" xlink:href="#e27"/><use class="halo" href="#e28" xlink:href="#e28"/>
       <use class="lit sql" href="#e20" xlink:href="#e20"/><use class="lit" href="#e21" xlink:href="#e21"/><use class="lit" href="#e22" xlink:href="#e22"/>
@@ -169,6 +176,26 @@
       <circle class="packet" r="3"><animateMotion dur="4.2s" begin="-2.1s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e23" xlink:href="#e23"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="4.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e27" xlink:href="#e27"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-0.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e28" xlink:href="#e28"/></animateMotion></circle>
+    </g>
+
+    <g class="scene" data-scene="knowledge" style="animation-delay:-8s">
+      <use class="halo" href="#e30" xlink:href="#e30"/><use class="halo" href="#e31" xlink:href="#e31"/><use class="halo" href="#e32" xlink:href="#e32"/>
+      <use class="halo" href="#e33" xlink:href="#e33"/><use class="halo" href="#e34" xlink:href="#e34"/><use class="halo" href="#e35" xlink:href="#e35"/>
+      <use class="halo" href="#e36" xlink:href="#e36"/>
+      <use class="lit" href="#e30" xlink:href="#e30"/><use class="lit" href="#e31" xlink:href="#e31"/><use class="lit" href="#e32" xlink:href="#e32"/>
+      <use class="lit sql" href="#e33" xlink:href="#e33"/><use class="lit sql" href="#e34" xlink:href="#e34"/><use class="lit" href="#e35" xlink:href="#e35"/>
+      <use class="lit sql" href="#e36" xlink:href="#e36"/>
+      <circle class="packet" r="3"><animateMotion dur="3.2s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e30" xlink:href="#e30"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="3.2s" begin="-1.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e30" xlink:href="#e30"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.4s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e31" xlink:href="#e31"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-1.2s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e31" xlink:href="#e31"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-0.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e32" xlink:href="#e32"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-1.8s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e32" xlink:href="#e32"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.4s" begin="-0.8s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e33" xlink:href="#e33"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.2s" begin="-1.4s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e34" xlink:href="#e34"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e35" xlink:href="#e35"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.6s" begin="-2.3s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e35" xlink:href="#e35"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="5.2s" begin="-1.1s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e36" xlink:href="#e36"/></animateMotion></circle>
     </g>
 
   </g>
@@ -305,6 +332,31 @@
       <text class="meta" x="844" y="555">:5000 · harness-net</text>
       <text class="sub2" x="844" y="565">runs · metrics · artifacts</text>
     </g>
+    <!-- 06 knowledge plane -->
+    <g class="node" data-id="okf-git" data-stage="knowledge">
+      <title>OKF + Git — canonical knowledge bodies; index.md, log.md and sanctioned .sql; linked by content_hash + commit_sha</title>
+      <rect class="card" x="232" y="440" width="160" height="64" rx="3"/>
+      <text class="kind" x="244" y="456">CANONICAL</text>
+      <text class="name" x="244" y="476">OKF + Git</text>
+      <text class="meta" x="244" y="491">index.md · log.md · .sql</text>
+      <text class="sub2" x="244" y="501">content_hash + commit_sha</text>
+    </g>
+    <g class="node" data-id="agentmem" data-stage="knowledge">
+      <title>agentmem — Go knowledge hub, port 8080, rules-first smart router with AFM-D System One fallback, dual-path read and Attested Computation</title>
+      <rect class="card" x="432" y="440" width="160" height="64" rx="3"/>
+      <text class="kind" x="444" y="456">KNOWLEDGE HUB</text>
+      <text class="name" x="444" y="476">agentmem</text>
+      <text class="meta" x="444" y="491">Go · :8080 · .env only</text>
+      <text class="sub2" x="444" y="501">write · read · migrate</text>
+    </g>
+    <g class="node" data-id="rag-adapters" data-stage="knowledge">
+      <title>RAG adapters — pluggable, rebuildable projections over agentmem-bridge/v1 sidecars</title>
+      <rect class="card" x="632" y="440" width="160" height="64" rx="3"/>
+      <text class="kind" x="644" y="456">PROJECTIONS</text>
+      <text class="name" x="644" y="476">RAG adapters</text>
+      <text class="meta" x="644" y="491">4 engines · pgvector</text>
+      <text class="sub2" x="644" y="501">sidecar bridge/v1</text>
+    </g>
   </g>
 
   <!-- ============ chrome: header, stage heads, legend, flows, substrate ============ -->
@@ -314,7 +366,7 @@
     <path d="M32 100H992" fill="none" stroke="url(#hr)" stroke-width="1"/>
 
     <rect class="badge" x="806" y="30" width="186" height="26" rx="13"/>
-    <text class="bt" x="899" y="47" text-anchor="middle">AUTO-CYCLING · 5 FLOWS</text>
+    <text class="bt" x="899" y="47" text-anchor="middle">AUTO-CYCLING · 6 FLOWS</text>
     <text class="sub2" x="992" y="76" text-anchor="end">github.com/ariacompute</text>
 
     <text class="colh" x="32"  y="138">01 · TOUCHPOINTS</text>
@@ -328,6 +380,21 @@
     <path class="rule" d="M632 146H792"/>
     <path class="rule" d="M832 146H992"/>
 
+    <!-- 06 knowledge plane row -->
+    <text class="colh" x="232" y="414">06 · KNOWLEDGE PLANE</text>
+    <path class="rule" d="M232 420H792"/>
+    <g>
+      <text class="sub2" x="244" y="524">Git is the only body authority</text>
+      <text class="sub2" x="244" y="538">OKF-first · conflicts surfaced</text>
+      <text class="sub2" x="244" y="552">permissive conformance</text>
+      <text class="sub2" x="444" y="524">write: rules R1–R7 → OKF → RAG</text>
+      <text class="sub2" x="444" y="538">read: dual-path merge · OKF wins</text>
+      <text class="sub2" x="444" y="552">/v1/knowledge · /v1/query</text>
+      <text class="sub2" x="644" y="524">attested SQL → receipt → verdict</text>
+      <text class="sub2" x="644" y="538">S1 fallback · fail closed to OKF</text>
+      <text class="sub2" x="644" y="552">sidecar agentmem-bridge/v1</text>
+    </g>
+
     <!-- edge protocol tags -->
     <g>
       <rect class="tagbg" x="202" y="194.5" width="20" height="11"/><text class="tag" x="212" y="203">A2A</text>
@@ -335,13 +402,17 @@
       <rect class="tagbg" x="600" y="194.5" width="24" height="11"/><text class="tag" x="612" y="203">HTTP</text>
       <rect class="tagbg" x="804" y="182.5" width="16" height="11"/><text class="tag" x="812" y="191">S1</text>
       <rect class="tagbg" x="400" y="276.5" width="24" height="11"/><text class="tag" x="412" y="285">MCP</text>
+      <rect class="tagbg" x="404" y="344.5" width="32" height="11"/><text class="tag" x="420" y="353">HTTP</text>
+      <rect class="tagbg" x="802" y="324.5" width="20" height="11"/><text class="tag" x="812" y="333">S1</text>
       <text class="tag" x="800" y="474">export</text>
       <text class="tag" x="920" y="414" text-anchor="start">ckpt</text>
       <text class="tag" x="920" y="500" text-anchor="start">metrics</text>
       <text class="tag" x="220" y="646">PG</text>
-      <text class="tag" x="424" y="646">ctx</text>
-      <text class="tag" x="512" y="646">sqlite</text>
-      <text class="tag" x="912" y="646">runs</text>
+      <text class="tag" x="404" y="646">ctx</text>
+      <text class="tag" x="620" y="646">sqlite</text>
+      <text class="tag" x="860" y="646">runs</text>
+      <text class="tag" x="804" y="646">rag</text>
+      <text class="tag" x="944" y="646">okf</text>
     </g>
 
     <!-- legend -->
@@ -359,30 +430,30 @@
     <!-- flow index -->
     <text class="lg-h" x="32" y="596">DATA FLOWS</text>
     <g>
-      <rect class="chip" x="32"  y="602" width="180" height="34" rx="2"/>
+      <rect class="chip" x="32" y="602" width="155" height="34" rx="2"/>
       <circle cx="46" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
       <text class="idx-n" x="58" y="621">01</text><text class="idx-t" x="80" y="621">A2A TASK</text>
       <text class="idx-p" x="46" y="631">A2A · HTTP</text>
-
-      <rect class="chip" x="227" y="602" width="180" height="34" rx="2"/>
-      <circle cx="241" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
-      <text class="idx-n" x="253" y="621">02</text><text class="idx-t" x="275" y="621">DECISION</text>
-      <text class="idx-p" x="241" y="631">System One · typed answers</text>
-
-      <rect class="chip" x="422" y="602" width="180" height="34" rx="2"/>
-      <circle cx="436" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
-      <text class="idx-n" x="448" y="621">03</text><text class="idx-t" x="470" y="621">MEMORY &amp; RAG</text>
-      <text class="idx-p" x="436" y="631">SQL · pgvector · FTS5</text>
-
-      <rect class="chip" x="617" y="602" width="180" height="34" rx="2"/>
-      <circle cx="631" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
-      <text class="idx-n" x="643" y="621">04</text><text class="idx-t" x="665" y="621">MCP TOOLS</text>
-      <text class="idx-p" x="631" y="631">stdio / streamable HTTP</text>
-
-      <rect class="chip" x="812" y="602" width="180" height="34" rx="2"/>
-      <circle cx="826" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
-      <text class="idx-n" x="838" y="621">05</text><text class="idx-t" x="860" y="621">TRAIN → SERVE</text>
-      <text class="idx-p" x="826" y="631">ckpt · export · runs</text>
+      <rect class="chip" x="193" y="602" width="155" height="34" rx="2"/>
+      <circle cx="207" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
+      <text class="idx-n" x="219" y="621">02</text><text class="idx-t" x="241" y="621">DECISION</text>
+      <text class="idx-p" x="207" y="631">System One · typed answers</text>
+      <rect class="chip" x="354" y="602" width="155" height="34" rx="2"/>
+      <circle cx="368" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
+      <text class="idx-n" x="380" y="621">03</text><text class="idx-t" x="402" y="621">MEMORY &amp; RAG</text>
+      <text class="idx-p" x="368" y="631">SQL · pgvector · FTS5</text>
+      <rect class="chip" x="515" y="602" width="155" height="34" rx="2"/>
+      <circle cx="529" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
+      <text class="idx-n" x="541" y="621">04</text><text class="idx-t" x="563" y="621">MCP TOOLS</text>
+      <text class="idx-p" x="529" y="631">stdio / streamable HTTP</text>
+      <rect class="chip" x="676" y="602" width="155" height="34" rx="2"/>
+      <circle cx="690" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
+      <text class="idx-n" x="702" y="621">05</text><text class="idx-t" x="724" y="621">TRAIN → SERVE</text>
+      <text class="idx-p" x="690" y="631">ckpt · export · runs</text>
+      <rect class="chip" x="837" y="602" width="155" height="34" rx="2"/>
+      <circle cx="851" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
+      <text class="idx-n" x="863" y="621">06</text><text class="idx-t" x="885" y="621">KNOWLEDGE</text>
+      <text class="idx-p" x="851" y="631">OKF → RAG · attested SQL</text>
     </g>
 
     <!-- state substrate -->
@@ -390,39 +461,46 @@
       <rect class="band" x="32" y="654" width="960" height="56" rx="3"/>
       <path class="band-div" d="M470 654V710"/>
       <path class="band-div" d="M700 654V710"/>
+      <path class="band-div" d="M890 654V710"/>
       <text class="band-t" x="44" y="676">POSTGRESQL + PGVECTOR</text>
-      <text class="band-s" x="44" y="692">hub · cloud</text>
+      <text class="band-s" x="44" y="692">hub · cloud · agentmem meta · verdicts</text>
       <text class="band-t" x="482" y="676">SQLITE · ARIA MEMO</text>
       <text class="band-s" x="482" y="692">on-device context · memories</text>
       <text class="band-t" x="712" y="676">APACHE AGE · MLFLOW</text>
       <text class="band-s" x="712" y="692">knowledge graph · training runs</text>
+      <text class="band-t" x="902" y="676">OKF + GIT</text>
+      <text class="band-s" x="902" y="692">bodies · commit_sha</text>
     </g>
 
-    <text class="foot" x="32" y="734">13 MODULES · 2 EXTERNAL · 5 FLOWS</text>
+    <text class="foot" x="32" y="734">16 MODULES · 2 EXTERNAL · 6 FLOWS</text>
     <text class="foot" x="992" y="734" text-anchor="end">ARIACOMPUTE.COM</text>
   </g>
 
   <!-- ============ flow chip highlights (in phase with scenes) ============ -->
   <g id="chips">
     <g class="scene" data-scene="a2a" style="animation-delay:0s">
-      <rect class="chip-on" x="32" y="602" width="180" height="34" rx="2"/>
+      <rect class="chip-on" x="32" y="602" width="155" height="34" rx="2"/>
       <circle cx="46" cy="619" r="2.6" fill="#FFF"/>
     </g>
-    <g class="scene" data-scene="decision" style="animation-delay:-32s">
-      <rect class="chip-on" x="227" y="602" width="180" height="34" rx="2"/>
-      <circle cx="241" cy="619" r="2.6" fill="#FFF"/>
+    <g class="scene" data-scene="decision" style="animation-delay:-40s">
+      <rect class="chip-on" x="193" y="602" width="155" height="34" rx="2"/>
+      <circle cx="207" cy="619" r="2.6" fill="#FFF"/>
     </g>
-    <g class="scene" data-scene="memory" style="animation-delay:-24s">
-      <rect class="chip-on" x="422" y="602" width="180" height="34" rx="2"/>
-      <circle cx="436" cy="619" r="2.6" fill="#FFF"/>
+    <g class="scene" data-scene="memory" style="animation-delay:-32s">
+      <rect class="chip-on" x="354" y="602" width="155" height="34" rx="2"/>
+      <circle cx="368" cy="619" r="2.6" fill="#FFF"/>
     </g>
-    <g class="scene" data-scene="mcp" style="animation-delay:-16s">
-      <rect class="chip-on" x="617" y="602" width="180" height="34" rx="2"/>
-      <circle cx="631" cy="619" r="2.6" fill="#FFF"/>
+    <g class="scene" data-scene="mcp" style="animation-delay:-24s">
+      <rect class="chip-on" x="515" y="602" width="155" height="34" rx="2"/>
+      <circle cx="529" cy="619" r="2.6" fill="#FFF"/>
     </g>
-    <g class="scene" data-scene="train" style="animation-delay:-8s">
-      <rect class="chip-on" x="812" y="602" width="180" height="34" rx="2"/>
-      <circle cx="826" cy="619" r="2.6" fill="#FFF"/>
+    <g class="scene" data-scene="train" style="animation-delay:-16s">
+      <rect class="chip-on" x="676" y="602" width="155" height="34" rx="2"/>
+      <circle cx="690" cy="619" r="2.6" fill="#FFF"/>
+    </g>
+    <g class="scene" data-scene="knowledge" style="animation-delay:-8s">
+      <rect class="chip-on" x="837" y="602" width="155" height="34" rx="2"/>
+      <circle cx="851" cy="619" r="2.6" fill="#FFF"/>
     </g>
   </g>
 </svg>
