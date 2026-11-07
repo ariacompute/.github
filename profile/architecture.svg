@@ -3,7 +3,7 @@
      aria-labelledby="svg-title svg-desc" shape-rendering="geometricPrecision"
      font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
   <title id="svg-title">Aria Compute — technology stack and data flows</title>
-  <desc id="svg-desc">Five-stage architecture map of Aria Compute. Touchpoints: agentbuddy (Tauri v2 desktop), cockpit (Android Compose car HMI), ariatag (Slack, Mail and WeChat AI employee). Orchestration: agenthub (A2A hub, port 3500), ariamem (knowledge and memory platform, port 8010), mcpx (MCP gateway, port 8848) in front of any HTTP service. Agent runtime: aria-agent-cloud (port 3000, SSE), aria-agent-core (recall, model, memorize, sandbox), cockpit store (port 3400), memo (on-device SQLite FTS5). Inference and routing: aria-router (port 8899, semantic, agent and afm-d routers), gateway (Bifrost behind Caddy or Nginx, 443), and external LLM providers. Models and training: aria-engine (port 8011, AFM-D runtime, /v1/systemone), ollaya (port 11435, local decision daemon), model/AFM-D (PyTorch, RLCD), ariapin (TRL post-training, port 8001), mlflow (port 5000). A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE and MLflow runs. Five flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, and train / export / serve.</desc>
+  <desc id="svg-desc">Five-stage architecture map of Aria Compute with 15 modules and five animated data flows. Touchpoints: agentbuddy (Tauri v2 desktop) submits A2A tasks to agenthub. Orchestration: agenthub (A2A hub, port 3500) persists task state in PostgreSQL and dispatches to agent/cloud; mcpx (MCP gateway, port 8848) publishes any HTTP service as MCP tools. Agent runtime: agent/cloud (port 3000, SSE) hosts the agent/core recall-model-memorize loop, which reads and writes memo (on-device SQLite FTS5) and calls gateway over HTTPS; agent/cloud keeps context in PostgreSQL plus pgvector. Inference and routing: router (port 8899) sends System One decisions to engine (port 8011, /v1/systemone) or the ollaya-compatible daemon (port 11435) and forwards completions to external LLMs; gateway (Bifrost behind Caddy, 443) also proxies to LLMs. Models and training: model weights load into engine and ollaya, pin (port 8001) post-trains checkpoints, exports to engine and reports metrics to mlflow (port 5000). A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE and MLflow runs. Five flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, and train / export / serve.</desc>
 
   <defs>
     <style>
@@ -83,29 +83,27 @@
 
   <!-- ============ edge geometry (single source of truth) ============ -->
   <g id="edges-base">
-    <path id="e01" class="edge"      data-from="agentbuddy" data-to="agenthub" data-kind="a2a" data-scene="a2a"      d="M192 200H232"/>
-    <path id="e02" class="edge"      data-from="agenthub" data-to="aria-agent-cloud" data-kind="a2a" data-scene="a2a" d="M392 200H432"/>
-    <path id="e03" class="edge"      data-from="aria-agent-cloud" data-to="aria-router" data-kind="http" data-scene="a2a" d="M592 200H632"/>
-    <path id="e04" class="edge"      data-from="aria-router" data-to="gateway" data-kind="http" data-scene="a2a"    d="M632 218H616V284H632"/>
-    <path id="e05" class="edge"      data-from="gateway" data-to="llm-providers" data-kind="https" data-scene="a2a"  d="M712 316V336"/>
-    <path id="e06" class="edge"      data-from="aria-router" data-to="aria-engine" data-kind="system-one" data-scene="decision" d="M792 188H832"/>
-    <path id="e07" class="edge"      data-from="aria-router" data-to="ollaya" data-kind="system-one" data-scene="decision"    d="M792 220H800V284H832"/>
-    <path id="e08" class="edge"      data-from="aria-agent-core" data-to="memo" data-kind="http" data-scene="memory"  d="M432 312H410V452H432"/>
-    <path id="e09" class="edge"      data-from="aria-agent-core" data-to="ariamem" data-kind="http" data-scene="memory" d="M432 274H392"/>
-    <path id="e10" class="edge"      data-from="aria-agent-core" data-to="mcpx" data-kind="mcp" data-scene="mcp"      d="M432 300H402V368H392"/>
-    <path id="e11" class="edge"      data-from="ariatag" data-to="mcpx" data-kind="mcp" data-scene="mcp"            d="M192 368H232"/>
-    <path id="e12" class="edge sse"  data-from="cockpit" data-to="aria-agent-cloud" data-kind="sse" data-scene="a2a" d="M112 252V156H500V168"/>
-    <path id="e13" class="edge"      data-from="cockpit" data-to="cockpit-store" data-kind="http" data-scene="memory" d="M192 296H206V540H610V368H592"/>
-    <path id="e14" class="edge"      data-from="agenthub" data-to="ariamem" data-kind="a2a" data-scene="a2a"       d="M312 232V252"/>
-    <path id="e15" class="edge"      data-from="mcpx" data-to="http-services" data-kind="http" data-scene="mcp"    d="M312 400V420"/>
-    <path id="e17" class="edge sql"  data-from="ariamem" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M232 284H220V654"/>
-    <path id="e18" class="edge sql"  data-from="aria-agent-cloud" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M432 218H420V654"/>
-    <path id="e19" class="edge sql"  data-from="memo" data-to="state-substrate" data-kind="sql" data-scene="memory"    d="M512 484V654"/>
-    <path id="e20" class="edge sql"  data-from="mlflow" data-to="state-substrate" data-kind="sql" data-scene="train"  d="M912 568V654"/>
-    <path id="e21" class="edge"      data-from="model-afm-d" data-to="ariapin" data-kind="checkpoint" data-scene="train" d="M912 400V420"/>
-    <path id="e22" class="edge"      data-from="ariapin" data-to="mlflow" data-kind="metrics" data-scene="train"       d="M912 484V504"/>
-    <path id="e23" class="edge"      data-from="ariapin" data-to="aria-engine" data-kind="export" data-scene="train"   d="M832 452H816V216H832"/>
-    <path id="e24" class="edge"      data-from="aria-agent-cloud" data-to="aria-agent-core" data-kind="loop" data-scene="a2a" d="M512 232V252"/>
+    <path id="e01" class="edge     " data-from="agentbuddy" data-to="agenthub" data-kind="a2a" data-scene="a2a" d="M192 200H232"/>
+    <path id="e02" class="edge     " data-from="agenthub" data-to="agent/cloud" data-kind="a2a" data-scene="a2a" d="M392 200H432"/>
+    <path id="e03" class="edge     " data-from="agent/cloud" data-to="router" data-kind="http" data-scene="a2a" d="M592 200H632"/>
+    <path id="e05" class="edge     " data-from="gateway" data-to="llms" data-kind="https" data-scene="a2a" d="M712 316V336"/>
+    <path id="e06" class="edge     " data-from="router" data-to="engine" data-kind="system-one" data-scene="decision" d="M792 188H832"/>
+    <path id="e07" class="edge     " data-from="router" data-to="ollaya" data-kind="system-one" data-scene="decision" d="M792 220H800V284H832"/>
+    <path id="e08" class="edge     " data-from="agent/core" data-to="memo" data-kind="local" data-scene="memory" d="M512 316V336"/>
+    <path id="e10" class="edge     " data-from="agent/core" data-to="mcpx" data-kind="mcp" data-scene="mcp" d="M432 284H392"/>
+    <path id="e15" class="edge     " data-from="mcpx" data-to="http-services" data-kind="http" data-scene="mcp" d="M312 316V336"/>
+    <path id="e18" class="edge sql " data-from="agent/cloud" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M432 218H420V654"/>
+    <path id="e19" class="edge sql " data-from="memo" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M512 400V654"/>
+    <path id="e20" class="edge sql " data-from="mlflow" data-to="state-substrate" data-kind="sql" data-scene="train" d="M912 568V654"/>
+    <path id="e21" class="edge     " data-from="model" data-to="pin" data-kind="checkpoint" data-scene="train" d="M912 400V420"/>
+    <path id="e22" class="edge     " data-from="pin" data-to="mlflow" data-kind="metrics" data-scene="train" d="M912 484V504"/>
+    <path id="e23" class="edge     " data-from="pin" data-to="engine" data-kind="export" data-scene="train" d="M832 452H816V216H832"/>
+    <path id="e24" class="edge     " data-from="agent/cloud" data-to="agent/core" data-kind="loop" data-scene="a2a" d="M512 232V252"/>
+    <path id="e25" class="edge     " data-from="agent/core" data-to="gateway" data-kind="https" data-scene="a2a" d="M592 296H632"/>
+    <path id="e26" class="edge sql " data-from="agenthub" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M232 218H220V654"/>
+    <path id="e27" class="edge     " data-from="model" data-to="engine" data-kind="weights" data-scene="train" d="M992 368H1002V200H992"/>
+    <path id="e28" class="edge     " data-from="model" data-to="ollaya" data-kind="weights" data-scene="train" d="M912 336V316"/>
+    <path id="e29" class="edge     " data-from="router" data-to="llms" data-kind="https" data-scene="decision" d="M632 218H610V368H632"/>
   </g>
 
   <!-- ============ flow scenes ============ -->
@@ -113,65 +111,66 @@
 
     <g class="scene" data-scene="a2a" style="animation-delay:0s">
       <use class="halo" href="#e01" xlink:href="#e01"/><use class="halo" href="#e02" xlink:href="#e02"/><use class="halo" href="#e03" xlink:href="#e03"/>
-      <use class="halo" href="#e04" xlink:href="#e04"/><use class="halo" href="#e05" xlink:href="#e05"/><use class="halo" href="#e12" xlink:href="#e12"/><use class="halo" href="#e14" xlink:href="#e14"/>
-      <use class="halo" href="#e24" xlink:href="#e24"/>
+      <use class="halo" href="#e05" xlink:href="#e05"/><use class="halo" href="#e24" xlink:href="#e24"/><use class="halo" href="#e25" xlink:href="#e25"/>
       <use class="lit" href="#e01" xlink:href="#e01"/><use class="lit" href="#e02" xlink:href="#e02"/><use class="lit" href="#e03" xlink:href="#e03"/>
-      <use class="lit" href="#e04" xlink:href="#e04"/><use class="lit" href="#e05" xlink:href="#e05"/><use class="lit sse" href="#e12" xlink:href="#e12"/><use class="lit" href="#e14" xlink:href="#e14"/>
-      <use class="lit" href="#e24" xlink:href="#e24"/>
+      <use class="lit" href="#e05" xlink:href="#e05"/><use class="lit" href="#e24" xlink:href="#e24"/><use class="lit" href="#e25" xlink:href="#e25"/>
       <circle class="packet" r="3"><animateMotion dur="2.4s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e01" xlink:href="#e01"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-1.2s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e01" xlink:href="#e01"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e02" xlink:href="#e02"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3s" begin="-1.5s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e02" xlink:href="#e02"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e03" xlink:href="#e03"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3s" begin="-1.5s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e03" xlink:href="#e03"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="3.4s" begin="-0.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e04" xlink:href="#e04"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="3.8s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e12" xlink:href="#e12"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="3.8s" begin="-1.9s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e12" xlink:href="#e12"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.2s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e24" xlink:href="#e24"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="3.2s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e25" xlink:href="#e25"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-0.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e05" xlink:href="#e05"/></animateMotion></circle>
     </g>
 
     <g class="scene" data-scene="decision" style="animation-delay:-32s">
       <use class="halo" href="#e03" xlink:href="#e03"/><use class="halo" href="#e06" xlink:href="#e06"/><use class="halo" href="#e07" xlink:href="#e07"/>
+      <use class="halo" href="#e29" xlink:href="#e29"/>
       <use class="lit" href="#e03" xlink:href="#e03"/><use class="lit" href="#e06" xlink:href="#e06"/><use class="lit" href="#e07" xlink:href="#e07"/>
+      <use class="lit" href="#e29" xlink:href="#e29"/>
       <circle class="packet" r="3"><animateMotion dur="3s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e03" xlink:href="#e03"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="2.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e06" xlink:href="#e06"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="2.6s" begin="-1.3s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e06" xlink:href="#e06"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3.4s" begin="-0.4s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e07" xlink:href="#e07"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="3.4s" begin="-2.1s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e07" xlink:href="#e07"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="3.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e29" xlink:href="#e29"/></animateMotion></circle>
     </g>
 
     <g class="scene" data-scene="memory" style="animation-delay:-24s">
-      <use class="halo" href="#e08" xlink:href="#e08"/><use class="halo" href="#e09" xlink:href="#e09"/><use class="halo" href="#e13" xlink:href="#e13"/>
-      <use class="halo" href="#e17" xlink:href="#e17"/><use class="halo" href="#e18" xlink:href="#e18"/>
-      <use class="halo" href="#e19" xlink:href="#e19"/>
-      <use class="lit" href="#e08" xlink:href="#e08"/><use class="lit" href="#e09" xlink:href="#e09"/><use class="lit" href="#e13" xlink:href="#e13"/>
-      <use class="lit sql" href="#e17" xlink:href="#e17"/><use class="lit sql" href="#e18" xlink:href="#e18"/>
-      <use class="lit sql" href="#e19" xlink:href="#e19"/>
-      <circle class="packet" r="3"><animateMotion dur="3.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e08" xlink:href="#e08"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="3.6s" begin="-1.8s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e08" xlink:href="#e08"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="2.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e09" xlink:href="#e09"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="4.6s" begin="0.2s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e13" xlink:href="#e13"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="4.6s" begin="-2.1s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e13" xlink:href="#e13"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="4.4s" begin="-0.8s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e17" xlink:href="#e17"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="4.4s" begin="-2.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e18" xlink:href="#e18"/></animateMotion></circle>
+      <use class="halo" href="#e08" xlink:href="#e08"/><use class="halo" href="#e18" xlink:href="#e18"/><use class="halo" href="#e19" xlink:href="#e19"/>
+      <use class="halo" href="#e26" xlink:href="#e26"/>
+      <use class="lit" href="#e08" xlink:href="#e08"/><use class="lit sql" href="#e18" xlink:href="#e18"/><use class="lit sql" href="#e19" xlink:href="#e19"/>
+      <use class="lit sql" href="#e26" xlink:href="#e26"/>
+      <circle class="packet" r="3"><animateMotion dur="2.8s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e08" xlink:href="#e08"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.8s" begin="-1.4s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e08" xlink:href="#e08"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.4s" begin="-0.8s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e18" xlink:href="#e18"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.4s" begin="-2.2s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e19" xlink:href="#e19"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.8s" begin="-1.2s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e26" xlink:href="#e26"/></animateMotion></circle>
     </g>
 
     <g class="scene" data-scene="mcp" style="animation-delay:-16s">
-      <use class="halo" href="#e10" xlink:href="#e10"/><use class="halo" href="#e11" xlink:href="#e11"/><use class="halo" href="#e15" xlink:href="#e15"/>
-      <use class="lit" href="#e10" xlink:href="#e10"/><use class="lit" href="#e11" xlink:href="#e11"/><use class="lit" href="#e15" xlink:href="#e15"/>
+      <use class="halo" href="#e10" xlink:href="#e10"/><use class="halo" href="#e15" xlink:href="#e15"/>
+      <use class="lit" href="#e10" xlink:href="#e10"/><use class="lit" href="#e15" xlink:href="#e15"/>
       <circle class="packet" r="3"><animateMotion dur="3.4s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e10" xlink:href="#e10"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3.4s" begin="-1.7s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e10" xlink:href="#e10"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="2.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e11" xlink:href="#e11"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e15" xlink:href="#e15"/></animateMotion></circle>
     </g>
 
     <g class="scene" data-scene="train" style="animation-delay:-8s">
       <use class="halo" href="#e20" xlink:href="#e20"/><use class="halo" href="#e21" xlink:href="#e21"/><use class="halo" href="#e22" xlink:href="#e22"/>
-      <use class="halo" href="#e23" xlink:href="#e23"/>
+      <use class="halo" href="#e23" xlink:href="#e23"/><use class="halo" href="#e27" xlink:href="#e27"/><use class="halo" href="#e28" xlink:href="#e28"/>
       <use class="lit sql" href="#e20" xlink:href="#e20"/><use class="lit" href="#e21" xlink:href="#e21"/><use class="lit" href="#e22" xlink:href="#e22"/>
-      <use class="lit" href="#e23" xlink:href="#e23"/>
+      <use class="lit" href="#e23" xlink:href="#e23"/><use class="lit" href="#e27" xlink:href="#e27"/><use class="lit" href="#e28" xlink:href="#e28"/>
+      <circle class="packet" r="3"><animateMotion dur="3.4s" begin="-0.5s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e20" xlink:href="#e20"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e21" xlink:href="#e21"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.6s" begin="-1.3s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e22" xlink:href="#e22"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="4.2s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e23" xlink:href="#e23"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="4.2s" begin="-2.1s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e23" xlink:href="#e23"/></animateMotion></circle>
-      <circle class="packet" r="3"><animateMotion dur="3.4s" begin="-0.5s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e20" xlink:href="#e20"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="4.6s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e27" xlink:href="#e27"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-0.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e28" xlink:href="#e28"/></animateMotion></circle>
     </g>
+
   </g>
 
   <!-- ============ nodes ============ -->
@@ -186,22 +185,6 @@
       <text class="meta" x="44" y="219">Tauri v2 · Vue 3</text>
       <text class="sub2" x="44" y="229">loopback proxy · 13 locales</text>
     </g>
-    <g class="node" data-id="cockpit" data-stage="touchpoints">
-      <title>cockpit — Android Compose car HMI, six-screen pager, cloud SSE + store sync</title>
-      <rect class="card" x="32" y="252" width="160" height="64" rx="3"/>
-      <text class="kind" x="44" y="268">MOBILE</text>
-      <text class="name" x="44" y="288">cockpit</text>
-      <text class="meta" x="44" y="303">Kotlin · Compose</text>
-      <text class="sub2" x="44" y="313">6 screens · memo backend</text>
-    </g>
-    <g class="node" data-id="ariatag" data-stage="touchpoints">
-      <title>ariatag — Slack, Mail and WeChat AI employee on PostgreSQL, pgvector and Apache AGE</title>
-      <rect class="card" x="32" y="336" width="160" height="64" rx="3"/>
-      <text class="kind" x="44" y="352">CHANNEL BOT</text>
-      <text class="name" x="44" y="372">ariatag</text>
-      <text class="meta" x="44" y="387">bun/TS · Slack·Mail·WeChat</text>
-      <text class="sub2" x="44" y="397">RAG · agent loop · MCP client</text>
-    </g>
 
     <!-- 02 orchestration -->
     <g class="node" data-id="agenthub" data-stage="orchestration">
@@ -212,71 +195,55 @@
       <text class="meta" x="244" y="219">Go · PG · :3500</text>
       <text class="sub2" x="244" y="229">registry · tasks · trace</text>
     </g>
-    <g class="node" data-id="ariamem" data-stage="orchestration">
-      <title>ariamem — knowledge and memory platform on Go and pgvector, port 8010</title>
-      <rect class="card" x="232" y="252" width="160" height="64" rx="3"/>
-      <text class="kind" x="244" y="268">KNOWLEDGE</text>
-      <text class="name" x="244" y="288">ariamem</text>
-      <text class="meta" x="244" y="303">Go · pgvector · :8010</text>
-      <text class="sub2" x="244" y="313">RAG · graph memory · skills</text>
-    </g>
     <g class="node" data-id="mcpx" data-stage="orchestration">
       <title>mcpx — MCP gateway, port 8848, publishes any HTTP service as MCP tools</title>
-      <rect class="card" x="232" y="336" width="160" height="64" rx="3"/>
-      <text class="kind" x="244" y="352">MCP GATEWAY</text>
-      <text class="name" x="244" y="372">mcpx</text>
-      <text class="meta" x="244" y="387">Go · stdio + HTTP · :8848</text>
-      <text class="sub2" x="244" y="397">YAML → tools · allowlist</text>
+      <rect class="card" x="232" y="252" width="160" height="64" rx="3"/>
+      <text class="kind" x="244" y="268">MCP GATEWAY</text>
+      <text class="name" x="244" y="288">mcpx</text>
+      <text class="meta" x="244" y="303">Go · stdio + HTTP · :8848</text>
+      <text class="sub2" x="244" y="313">YAML → tools · allowlist</text>
     </g>
     <g class="node" data-id="http-services" data-stage="orchestration">
       <title>HTTP services — any language or framework, reachable through the mcpx prefix allowlist</title>
-      <rect class="card ext" x="232" y="420" width="160" height="64" rx="3"/>
-      <text class="kind" x="244" y="436">UPSTREAM</text>
-      <text class="name" x="244" y="456">HTTP services</text>
-      <text class="meta" x="244" y="471">any API · any language</text>
-      <text class="sub2" x="244" y="481">prefix allowlist · limits</text>
+      <rect class="card ext" x="232" y="336" width="160" height="64" rx="3"/>
+      <text class="kind" x="244" y="352">UPSTREAM</text>
+      <text class="name" x="244" y="372">HTTP services</text>
+      <text class="meta" x="244" y="387">any API · any language</text>
+      <text class="sub2" x="244" y="397">prefix allowlist · limits</text>
     </g>
 
     <!-- 03 agent runtime -->
-    <g class="node" data-id="aria-agent-cloud" data-stage="runtime">
-      <title>aria-agent-cloud — Rust axum service, port 3000, OpenAI beta Agents API with SSE, Postgres and pgvector context</title>
+    <g class="node" data-id="agent/cloud" data-stage="runtime">
+      <title>agent/cloud — Rust axum service, port 3000, OpenAI beta Agents API with SSE, Postgres and pgvector context</title>
       <rect class="card" x="432" y="168" width="160" height="64" rx="3"/>
       <text class="kind" x="444" y="184">RUNTIME</text>
-      <text class="name" x="444" y="204">aria-agent-cloud</text>
+      <text class="name" x="444" y="204">agent/cloud</text>
       <text class="meta" x="444" y="219">Rust axum · SSE · :3000</text>
       <text class="sub2" x="444" y="229">SDK: JS Py Swift Kotlin</text>
     </g>
-    <g class="node" data-id="aria-agent-core" data-stage="runtime">
-      <title>aria-agent-core — recall, model, memorize agent loop with pluggable sandbox</title>
+    <g class="node" data-id="agent/core" data-stage="runtime">
+      <title>agent/core — recall, model, memorize agent loop with pluggable sandbox</title>
       <rect class="card" x="432" y="252" width="160" height="64" rx="3"/>
       <text class="kind" x="444" y="268">RUNTIME</text>
-      <text class="name" x="444" y="288">aria-agent-core</text>
+      <text class="name" x="444" y="288">agent/core</text>
       <text class="meta" x="444" y="303">recall → model → memorize</text>
       <text class="sub2" x="444" y="313">sandbox: Docker · Kata</text>
     </g>
-    <g class="node" data-id="cockpit-store" data-stage="runtime">
-      <title>cockpit store — Rust axum structured data and memory sync service, port 3400</title>
-      <rect class="card" x="432" y="336" width="160" height="64" rx="3"/>
-      <text class="kind" x="444" y="352">SYNC</text>
-      <text class="name" x="444" y="372">cockpit/store</text>
-      <text class="meta" x="444" y="387">Rust axum · :3400</text>
-      <text class="sub2" x="444" y="397">push / pull · /v1/sync/*</text>
-    </g>
     <g class="node" data-id="memo" data-stage="runtime">
       <title>memo — local-first long-term memory, SQLite FTS5 plus local embeddings, four relation views</title>
-      <rect class="card" x="432" y="420" width="160" height="64" rx="3"/>
-      <text class="kind" x="444" y="436">ON-DEVICE</text>
-      <text class="name" x="444" y="456">memo</text>
-      <text class="meta" x="444" y="471">SQLite FTS5 + cosine</text>
-      <text class="sub2" x="444" y="481">zero network · 4 relations</text>
+      <rect class="card" x="432" y="336" width="160" height="64" rx="3"/>
+      <text class="kind" x="444" y="352">ON-DEVICE</text>
+      <text class="name" x="444" y="372">memo</text>
+      <text class="meta" x="444" y="387">SQLite FTS5 + cosine</text>
+      <text class="sub2" x="444" y="397">zero network · 4 relations</text>
     </g>
 
     <!-- 04 inference and routing -->
-    <g class="node" data-id="aria-router" data-stage="routing">
-      <title>aria-router — OpenAI-compatible inference gateway, port 8899, semantic, agent and afm-d routers</title>
+    <g class="node" data-id="router" data-stage="routing">
+      <title>router — OpenAI-compatible inference gateway, port 8899, semantic, agent and afm-d routers</title>
       <rect class="card" x="632" y="168" width="160" height="64" rx="3"/>
       <text class="kind" x="644" y="184">ROUTER</text>
-      <text class="name" x="644" y="204">aria-router</text>
+      <text class="name" x="644" y="204">router</text>
       <text class="meta" x="644" y="219">Rust · :8899 · mgmt :8080</text>
       <text class="sub2" x="644" y="229">semantic · agent · afm-d</text>
     </g>
@@ -288,21 +255,21 @@
       <text class="meta" x="644" y="303">Bifrost + Caddy</text>
       <text class="sub2" x="644" y="313">TLS · reverse proxy</text>
     </g>
-    <g class="node" data-id="llm-providers" data-stage="routing">
-      <title>LLM providers — external OpenAI-compatible upstream model vendors</title>
+    <g class="node" data-id="llms" data-stage="routing">
+      <title>LLMs — external OpenAI-compatible upstream model vendors</title>
       <rect class="card ext" x="632" y="336" width="160" height="64" rx="3"/>
       <text class="kind" x="644" y="352">EXTERNAL</text>
-      <text class="name" x="644" y="372">LLM providers</text>
+      <text class="name" x="644" y="372">LLMs</text>
       <text class="meta" x="644" y="387">OpenAI-compatible</text>
       <text class="sub2" x="644" y="397">upstream model vendors</text>
     </g>
 
     <!-- 05 models and training -->
-    <g class="node" data-id="aria-engine" data-stage="models">
-      <title>aria-engine — Rust AFM-D runtime, port 8011, POST /v1/systemone, C ABI</title>
+    <g class="node" data-id="engine" data-stage="models">
+      <title>engine — Rust AFM-D runtime, port 8011, POST /v1/systemone, C ABI</title>
       <rect class="card" x="832" y="168" width="160" height="64" rx="3"/>
       <text class="kind" x="844" y="184">ENGINE</text>
-      <text class="name" x="844" y="204">aria-engine</text>
+      <text class="name" x="844" y="204">engine</text>
       <text class="meta" x="844" y="219">Rust AFM-D · :8011</text>
       <text class="sub2" x="844" y="229">/v1/systemone · C ABI</text>
     </g>
@@ -314,19 +281,19 @@
       <text class="meta" x="844" y="303">ONNX + llama.cpp · :11435</text>
       <text class="sub2" x="844" y="313">TypeSafe-compatible</text>
     </g>
-    <g class="node" data-id="model-afm-d" data-stage="models">
-      <title>model / AFM-D — ModernBERT decision model trained with RLCD, 1024 token state, 512 token option head</title>
+    <g class="node" data-id="model" data-stage="models">
+      <title>model — ModernBERT decision model trained with RLCD, 1024 token state, 512 token option head</title>
       <rect class="card" x="832" y="336" width="160" height="64" rx="3"/>
       <text class="kind" x="844" y="352">TRAIN</text>
-      <text class="name" x="844" y="372">model / AFM-D</text>
+      <text class="name" x="844" y="372">model</text>
       <text class="meta" x="844" y="387">PyTorch · RLCD · 1024 tok</text>
       <text class="sub2" x="844" y="397">choice · score · noul</text>
     </g>
-    <g class="node" data-id="ariapin" data-stage="models">
-      <title>ariapin — TRL post-training service, port 8001, LoRA lifecycle and gguf, mlx, mnn, qnn export</title>
+    <g class="node" data-id="pin" data-stage="models">
+      <title>pin — TRL post-training service, port 8001, LoRA lifecycle and gguf, mlx, mnn, qnn export</title>
       <rect class="card" x="832" y="420" width="160" height="64" rx="3"/>
       <text class="kind" x="844" y="436">POST-TRAIN</text>
-      <text class="name" x="844" y="456">ariapin</text>
+      <text class="name" x="844" y="456">pin</text>
       <text class="meta" x="844" y="471">TRL · :8001</text>
       <text class="sub2" x="844" y="481">SFT OPD DPO GRPO QAT</text>
     </g>
@@ -367,14 +334,11 @@
       <rect class="tagbg" x="402" y="194.5" width="20" height="11"/><text class="tag" x="412" y="203">A2A</text>
       <rect class="tagbg" x="600" y="194.5" width="24" height="11"/><text class="tag" x="612" y="203">HTTP</text>
       <rect class="tagbg" x="804" y="182.5" width="16" height="11"/><text class="tag" x="812" y="191">S1</text>
-      <rect class="tagbg" x="400" y="268.5" width="24" height="11"/><text class="tag" x="412" y="277">HTTP</text>
-      <rect class="tagbg" x="202" y="362.5" width="20" height="11"/><text class="tag" x="212" y="371">MCP</text>
-      <rect class="tagbg" x="311" y="151" width="26" height="11"/><text class="tag" x="324" y="159.5">SSE</text>
-      <rect class="tagbg" x="417" y="534.5" width="24" height="11"/><text class="tag" x="429" y="543">sync</text>
+      <rect class="tagbg" x="400" y="276.5" width="24" height="11"/><text class="tag" x="412" y="285">MCP</text>
       <text class="tag" x="800" y="474">export</text>
       <text class="tag" x="920" y="414" text-anchor="start">ckpt</text>
       <text class="tag" x="920" y="500" text-anchor="start">metrics</text>
-      <text class="tag" x="220" y="646">pgvector</text>
+      <text class="tag" x="220" y="646">PG</text>
       <text class="tag" x="424" y="646">ctx</text>
       <text class="tag" x="512" y="646">sqlite</text>
       <text class="tag" x="912" y="646">runs</text>
@@ -398,7 +362,7 @@
       <rect class="chip" x="32"  y="602" width="180" height="34" rx="2"/>
       <circle cx="46" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
       <text class="idx-n" x="58" y="621">01</text><text class="idx-t" x="80" y="621">A2A TASK</text>
-      <text class="idx-p" x="46" y="631">A2A · SSE · HTTP</text>
+      <text class="idx-p" x="46" y="631">A2A · HTTP</text>
 
       <rect class="chip" x="227" y="602" width="180" height="34" rx="2"/>
       <circle cx="241" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
@@ -427,14 +391,14 @@
       <path class="band-div" d="M470 654V710"/>
       <path class="band-div" d="M700 654V710"/>
       <text class="band-t" x="44" y="676">POSTGRESQL + PGVECTOR</text>
-      <text class="band-s" x="44" y="692">hub · cloud · ariamem · ariatag</text>
+      <text class="band-s" x="44" y="692">hub · cloud</text>
       <text class="band-t" x="482" y="676">SQLITE · ARIA MEMO</text>
       <text class="band-s" x="482" y="692">on-device context · memories</text>
       <text class="band-t" x="712" y="676">APACHE AGE · MLFLOW</text>
       <text class="band-s" x="712" y="692">knowledge graph · training runs</text>
     </g>
 
-    <text class="foot" x="32" y="734">17 MODULES · 2 EXTERNAL · 5 FLOWS</text>
+    <text class="foot" x="32" y="734">13 MODULES · 2 EXTERNAL · 5 FLOWS</text>
     <text class="foot" x="992" y="734" text-anchor="end">ARIACOMPUTE.COM</text>
   </g>
 
