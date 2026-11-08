@@ -3,7 +3,7 @@
      aria-labelledby="svg-title svg-desc" shape-rendering="geometricPrecision"
      font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
   <title id="svg-title">Aria Compute — technology stack and data flows</title>
-  <desc id="svg-desc">Six-stage architecture map of Aria Compute with 16 modules, two external services and six animated data flows. Touchpoints: agentbuddy (Tauri v2 desktop) submits A2A tasks to agenthub. Orchestration: agenthub (A2A hub, port 3500) persists task state in PostgreSQL and dispatches to agent/cloud; mcpx (MCP gateway, port 8848) publishes any HTTP service as MCP tools. Agent runtime: agent/cloud (port 3000, SSE) hosts the agent/core recall-model-memorize loop, which reads and writes memo (on-device SQLite FTS5) and calls gateway over HTTPS; agent/cloud keeps context in PostgreSQL plus pgvector. Inference and routing: router (port 8899) sends System One decisions to engine (port 8011, /v1/systemone) or the ollaya-compatible daemon (port 11435) and forwards completions to external LLMs; gateway (Bifrost behind Caddy, 443) also proxies to LLMs. Models and training: model weights load into engine and ollaya, pin (port 8001) post-trains checkpoints, exports to engine and reports metrics to mlflow (port 5000). Knowledge plane: agentmem (Go, port 8080) is a knowledge hub for AI agents; agent/core calls /v1/knowledge and /v1/query, a rules-first smart router (R1-R7) sends only ambiguous choices to AFM-D System One with a fail-closed fallback to OKF, OKF + Git holds the only canonical knowledge bodies linked by content_hash + commit_sha, RAG adapters hold rebuildable projections, and Attested Computations turn sanctioned SQL into audited verdicts. A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE, MLflow runs and OKF + Git bodies. Six flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, knowledge plane, and train / export / serve.</desc>
+  <desc id="svg-desc">Six-stage architecture map of Aria Compute with 16 modules, three external services and six animated data flows. Touchpoints: agentbuddy is a native .NET 10 + Avalonia 11 desktop client for the workbench — 15 screens, 13 locales, no backend, no database and no WebView; its in-process ASP.NET Core loopback gateway on 127.0.0.1 forwards only /api, /a2a, /healthz and /.well-known, serves /__shell/* as the local control plane and reuses the agenthub session cookie, and chat channels (Slack, Teams, Telegram, SMS) deliver webhook tasks to the same hub. Orchestration: agenthub (A2A hub, port 3500) speaks JSON-RPC 2.0 message/send, message/stream, tasks/get, tasks/cancel and tasks/resume, keeps a five-kind asset registry with approval, parks and resumes HITL approvals, persists task state in PostgreSQL and dispatches to agent/cloud; mcpx (MCP gateway, port 8848) publishes any HTTP service as MCP tools. Agent runtime: agent/cloud (port 3000, SSE) hosts the agent/core recall-model-memorize loop, which reads and writes memo (on-device SQLite FTS5) and calls gateway over HTTPS; agent/cloud keeps context in PostgreSQL plus pgvector. Inference and routing: router (port 8899) sends System One decisions to engine (port 8011, /v1/systemone) or the ollaya-compatible daemon (port 11435) and forwards completions to external LLMs; gateway (Bifrost behind Caddy, 443) also proxies to LLMs. Models and training: model weights load into engine and ollaya, pin (port 8001) post-trains checkpoints, exports to engine and reports metrics to mlflow (port 5000). Knowledge plane: agentmem (Go, port 8080) is a knowledge hub for AI agents; agent/core calls /v1/knowledge and /v1/query, a rules-first smart router (R1-R7) sends only ambiguous choices to AFM-D System One with a fail-closed fallback to OKF, OKF + Git holds the only canonical knowledge bodies linked by content_hash + commit_sha, RAG adapters hold rebuildable projections, and Attested Computations turn sanctioned SQL into audited verdicts. A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE, MLflow runs and OKF + Git bodies. Six flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, knowledge plane, and train / export / serve.</desc>
 
   <defs>
     <style>
@@ -92,6 +92,7 @@
     <path id="e08" class="edge     " data-from="agent/core" data-to="memo" data-kind="local" data-scene="memory" d="M512 316V336"/>
     <path id="e10" class="edge     " data-from="agent/core" data-to="mcpx" data-kind="mcp" data-scene="mcp" d="M432 284H392"/>
     <path id="e15" class="edge     " data-from="mcpx" data-to="http-services" data-kind="http" data-scene="mcp" d="M312 316V336"/>
+    <path id="e16" class="edge     " data-from="channels" data-to="agenthub" data-kind="webhook" data-scene="a2a" d="M192 284H212V216H232"/>
     <path id="e18" class="edge sql " data-from="agent/cloud" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M432 218H404V654"/>
     <path id="e19" class="edge sql " data-from="memo" data-to="state-substrate" data-kind="sql" data-scene="memory" d="M592 384H620V654"/>
     <path id="e20" class="edge sql " data-from="mlflow" data-to="state-substrate" data-kind="sql" data-scene="train" d="M912 568H860V654"/>
@@ -119,8 +120,10 @@
     <g class="scene" data-scene="a2a" style="animation-delay:0s">
       <use class="halo" href="#e01" xlink:href="#e01"/><use class="halo" href="#e02" xlink:href="#e02"/><use class="halo" href="#e03" xlink:href="#e03"/>
       <use class="halo" href="#e05" xlink:href="#e05"/><use class="halo" href="#e24" xlink:href="#e24"/><use class="halo" href="#e25" xlink:href="#e25"/>
+      <use class="halo" href="#e16" xlink:href="#e16"/>
       <use class="lit" href="#e01" xlink:href="#e01"/><use class="lit" href="#e02" xlink:href="#e02"/><use class="lit" href="#e03" xlink:href="#e03"/>
       <use class="lit" href="#e05" xlink:href="#e05"/><use class="lit" href="#e24" xlink:href="#e24"/><use class="lit" href="#e25" xlink:href="#e25"/>
+      <use class="lit" href="#e16" xlink:href="#e16"/>
       <circle class="packet" r="3"><animateMotion dur="2.4s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e01" xlink:href="#e01"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-1.2s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e01" xlink:href="#e01"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e02" xlink:href="#e02"/></animateMotion></circle>
@@ -128,6 +131,7 @@
       <circle class="packet" r="3"><animateMotion dur="3s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e03" xlink:href="#e03"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3s" begin="-1.5s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e03" xlink:href="#e03"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="2.2s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e24" xlink:href="#e24"/></animateMotion></circle>
+      <circle class="packet" r="3"><animateMotion dur="2.8s" begin="-0.8s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1" keyTimes="0;1"><mpath href="#e16" xlink:href="#e16"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="3.2s" begin="0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e25" xlink:href="#e25"/></animateMotion></circle>
       <circle class="packet" r="3"><animateMotion dur="2.4s" begin="-0.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;0" keyTimes="0;0.5;1"><mpath href="#e05" xlink:href="#e05"/></animateMotion></circle>
     </g>
@@ -205,22 +209,31 @@
 
     <!-- 01 touchpoints -->
     <g class="node" data-id="agentbuddy" data-stage="touchpoints">
-      <title>agentbuddy — Tauri v2 + Vue 3 desktop workbench, loopback proxy to agenthub</title>
+      <title>agentbuddy — native .NET 10 + Avalonia 11 desktop client for the workbench, 15 screens and 13 locales, no backend, no database and no WebView; an in-process ASP.NET Core (Kestrel) loopback gateway on 127.0.0.1 forwards only /api, /a2a, /healthz and /.well-known, serves /__shell/* as its local control plane and reuses the agenthub session cookie</title>
       <rect class="card" x="32" y="168" width="160" height="64" rx="3"/>
-      <text class="kind" x="44" y="184">DESKTOP</text>
+      <text class="kind" x="44" y="184">DESKTOP · 15 SCREENS</text>
       <text class="name" x="44" y="204">agentbuddy</text>
-      <text class="meta" x="44" y="219">Tauri v2 · Vue 3</text>
-      <text class="sub2" x="44" y="229">loopback proxy · 13 locales</text>
+      <text class="meta" x="44" y="219">.NET 10 · Avalonia 11</text>
+      <text class="sub2" x="44" y="229">loopback gateway · 13 locales</text>
+    </g>
+
+    <g class="node" data-id="channels" data-stage="touchpoints">
+      <title>channels — Slack, Teams, Telegram and SMS webhooks; inbound messages become A2A tasks and HITL approvals are answered from the same thread</title>
+      <rect class="card ext" x="32" y="252" width="160" height="64" rx="3"/>
+      <text class="kind" x="44" y="268">CHANNELS</text>
+      <text class="name" x="44" y="288">chat channels</text>
+      <text class="meta" x="44" y="303">Slack · Teams · Telegram</text>
+      <text class="sub2" x="44" y="313">SMS · webhook ingress</text>
     </g>
 
     <!-- 02 orchestration -->
     <g class="node" data-id="agenthub" data-stage="orchestration">
-      <title>agenthub — A2A hub on Go and PostgreSQL, port 3500, registry and task state machine</title>
+      <title>agenthub — Go and PostgreSQL A2A hub, port 3500, JSON-RPC 2.0 message/send, message/stream, tasks/get, tasks/cancel and tasks/resume, five-kind asset registry with approval, HITL park and resume, channels, connectors and sandboxed execution</title>
       <rect class="card" x="232" y="168" width="160" height="64" rx="3"/>
       <text class="kind" x="244" y="184">A2A HUB</text>
       <text class="name" x="244" y="204">agenthub</text>
       <text class="meta" x="244" y="219">Go · PG · :3500</text>
-      <text class="sub2" x="244" y="229">registry · tasks · trace</text>
+      <text class="sub2" x="244" y="229">registry · tasks · HITL</text>
     </g>
     <g class="node" data-id="mcpx" data-stage="orchestration">
       <title>mcpx — MCP gateway, port 8848, publishes any HTTP service as MCP tools</title>
@@ -401,6 +414,7 @@
       <rect class="tagbg" x="402" y="194.5" width="20" height="11"/><text class="tag" x="412" y="203">A2A</text>
       <rect class="tagbg" x="600" y="194.5" width="24" height="11"/><text class="tag" x="612" y="203">HTTP</text>
       <rect class="tagbg" x="804" y="182.5" width="16" height="11"/><text class="tag" x="812" y="191">S1</text>
+      <text class="tag" x="202" y="244">hook</text>
       <rect class="tagbg" x="400" y="276.5" width="24" height="11"/><text class="tag" x="412" y="285">MCP</text>
       <rect class="tagbg" x="404" y="344.5" width="32" height="11"/><text class="tag" x="420" y="353">HTTP</text>
       <rect class="tagbg" x="802" y="324.5" width="20" height="11"/><text class="tag" x="812" y="333">S1</text>
@@ -433,7 +447,7 @@
       <rect class="chip" x="32" y="602" width="155" height="34" rx="2"/>
       <circle cx="46" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
       <text class="idx-n" x="58" y="621">01</text><text class="idx-t" x="80" y="621">A2A TASK</text>
-      <text class="idx-p" x="46" y="631">A2A · HTTP</text>
+      <text class="idx-p" x="46" y="631">A2A · webhook</text>
       <rect class="chip" x="193" y="602" width="155" height="34" rx="2"/>
       <circle cx="207" cy="619" r="2.6" fill="none" stroke="#4A4A4A"/>
       <text class="idx-n" x="219" y="621">02</text><text class="idx-t" x="241" y="621">DECISION</text>
@@ -472,7 +486,7 @@
       <text class="band-s" x="902" y="692">bodies · commit_sha</text>
     </g>
 
-    <text class="foot" x="32" y="734">16 MODULES · 2 EXTERNAL · 6 FLOWS</text>
+    <text class="foot" x="32" y="734">16 MODULES · 3 EXTERNAL · 6 FLOWS</text>
     <text class="foot" x="992" y="734" text-anchor="end">ARIACOMPUTE.COM</text>
   </g>
 
