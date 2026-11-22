@@ -3,7 +3,7 @@
      aria-labelledby="svg-title svg-desc" shape-rendering="geometricPrecision"
      font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
   <title id="svg-title">Aria Compute — technology stack and data flows</title>
-  <desc id="svg-desc">Six-stage architecture map of Aria Compute with 15 modules, three external services and six animated data flows. Touchpoints: agentbuddy is a Tauri v2 + Vue 3 desktop client for the workbench — 15 screens, 13 locales, no backend and no database; its in-process axum loopback reverse proxy on 127.0.0.1 forwards only /api, /a2a, /healthz and /.well-known, serves /__shell/* as the local control plane and reuses the agenthub session cookie, and chat channels (Slack, Teams, Telegram, SMS) deliver webhook tasks to the same hub. Orchestration: agenthub (A2A hub, port 3500) speaks JSON-RPC 2.0 message/send, message/stream, tasks/get, tasks/cancel and tasks/resume, keeps a five-kind asset registry with approval, parks and resumes HITL approvals, persists task state in PostgreSQL and dispatches to agent/cloud; mcpx (MCP gateway, port 8848) publishes any HTTP service as MCP tools. Agent runtime: agent/cloud (port 3000, SSE) exposes the OpenAI beta Agents API with a session event stream (approval and usage frames), session titles, agent teams and scheduled jobs, and keeps context in PostgreSQL plus pgvector; agent/core is a plugin-seam kernel running the recall-model-memorize loop through permission presets, fail-closed approvals and a pluggable sandbox (Docker, Kata, Cube, browser), reading and writing memo (on-device SQLite FTS5) and calling gateway over HTTPS. Inference and routing: router (port 8899) sends System One decisions to engine (port 8011, /v1/systemone) or the ollaya-compatible daemon (port 11435) and forwards completions to external LLMs; gateway (Bifrost behind Caddy, 443) also proxies to LLMs. Models and training: model weights load into engine and ollaya, pin (port 8001) post-trains checkpoints, exports to engine. Knowledge plane: agentmem (Go, port 8080) is a knowledge hub for AI agents; a rules-first smart router (R1-R7) sends only ambiguous choices to AFM-D System One with a fail-closed fallback to OKF, OKF + Git holds the only canonical knowledge bodies linked by content_hash + commit_sha, RAG adapters hold rebuildable projections, and Attested Computations turn sanctioned SQL into audited verdicts. A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE and OKF + Git bodies. Six flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, knowledge plane, and train / export / serve.</desc>
+  <desc id="svg-desc">Six-stage architecture map of Aria Compute with 15 modules, three external services and six animated data flows. Touchpoints: agentbuddy is a Tauri v2 + Vue 3 desktop client for the workbench — 15 screens, 13 locales, no backend and no database; its in-process axum loopback reverse proxy on 127.0.0.1 forwards only /api, /a2a, /healthz and /.well-known, serves /__shell/* as the local control plane and reuses the agenthub session cookie, and chat channels (Slack, Teams, Telegram, SMS) deliver webhook tasks to the same hub. Orchestration: agenthub (A2A hub, port 3500) speaks JSON-RPC 2.0 message/send, message/stream, tasks/get, tasks/cancel and tasks/resume, keeps a five-kind asset registry with approval, parks and resumes HITL approvals, persists task state in PostgreSQL and dispatches to agent/cloud; mcpx (MCP gateway, port 8848) publishes any HTTP service as MCP tools. Agent runtime: agent/cloud (port 3000, SSE) exposes the OpenAI beta Agents API with a session event stream (approval and usage frames), session titles, agent teams and scheduled jobs, keeps context in PostgreSQL plus pgvector, and serves five thin cloud-only SDK clients (Rust, JS, Python, Swift, Kotlin) with no embedded runtime or provider key; agent/core is a capability-seam kernel running the recall-runtime-memorize loop, defaulting to the external DeepSeek Harness (dsh) as a per-session child process over stdio JSON-RPC with the in-process Rust loop as an explicit fallback, passing through permission presets, fail-closed approvals, a governance boundary (egress decision, credential substitution, JSONL audit and usage metering) and a pluggable sandbox (Docker, Kata, Cube, browser), reading and writing memo (on-device SQLite with FTS5 BM25 and local embeddings) and calling gateway over HTTPS. Inference and routing: router (port 8899) sends System One decisions to engine (port 8011, /v1/systemone) or the ollaya-compatible daemon (port 11435) and forwards completions to external LLMs; gateway (Bifrost behind Caddy, 443) also proxies to LLMs. Models and training: model weights load into engine and ollaya, pin (port 8001) post-trains checkpoints, exports to engine. Knowledge plane: agentmem (Go, port 8080) is a knowledge hub for AI agents; a rules-first smart router (R1-R7) sends only ambiguous choices to AFM-D System One with a fail-closed fallback to OKF, OKF + Git holds the only canonical knowledge bodies linked by content_hash + commit_sha, RAG adapters hold rebuildable projections, and Attested Computations turn sanctioned SQL into audited verdicts. A shared state substrate holds PostgreSQL plus pgvector, SQLite aria memo, Apache AGE and OKF + Git bodies. Six flows cycle automatically every eight seconds: A2A task, decision via System One, memory and RAG, MCP tools and channels, knowledge plane, and train / export / serve.</desc>
 
   <defs>
     <style>
@@ -250,7 +250,7 @@
 
     <!-- 03 agent runtime -->
     <g class="node" data-id="agent/cloud" data-stage="runtime">
-      <title>agent/cloud — Rust axum service, port 3000, OpenAI beta Agents API with SSE; session event stream with approval and usage frames, session titles, agent teams and scheduled jobs; Postgres and pgvector context</title>
+      <title>agent/cloud — Rust axum service, port 3000, OpenAI beta Agents API with SSE; session event stream with approval and usage frames, session titles, agent teams and scheduled jobs; context in Postgres plus pgvector; all SDKs are thin cloud-only clients (Rust, JS, Python, Swift, Kotlin) with no embedded runtime or provider key</title>
       <rect class="card" x="432" y="168" width="160" height="64" rx="3"/>
       <text class="kind" x="444" y="184">RUNTIME</text>
       <text class="name" x="444" y="204">agent/cloud</text>
@@ -258,20 +258,20 @@
       <text class="sub2" x="444" y="229">titles · teams · jobs · SSE</text>
     </g>
     <g class="node" data-id="agent/core" data-stage="runtime">
-      <title>agent/core — plugin-seam kernel running the recall, model, memorize loop with permission presets, fail-closed approvals and a pluggable sandbox (Docker, Kata, Cube, browser)</title>
+      <title>agent/core — capability-seam kernel: recall → runtime → memorize; default turn runtime is the external DeepSeek Harness (dsh) as a child process over stdio JSON-RPC with the native Rust loop as fallback; permission presets, fail-closed approvals, a governance boundary, session events and a pluggable sandbox (Docker, Kata, Cube, browser)</title>
       <rect class="card" x="432" y="252" width="160" height="64" rx="3"/>
       <text class="kind" x="444" y="268">RUNTIME</text>
       <text class="name" x="444" y="288">agent/core</text>
-      <text class="meta" x="444" y="303">recall → model → memorize</text>
-      <text class="sub2" x="444" y="313">seams · presets · Docker/Kata</text>
+      <text class="meta" x="444" y="303">recall → runtime → memorize</text>
+      <text class="sub2" x="444" y="313">dsh · seams · governance</text>
     </g>
     <g class="node" data-id="memo" data-stage="runtime">
-      <title>memo — local-first long-term memory, SQLite FTS5 plus local embeddings, four relation views</title>
+      <title>memo — local-first long-term memory: SQLite with FTS5 BM25 lexical pushdown and local embeddings (ngram / TF-IDF + cosine), hybrid search and pure vector recall, batch retrieval, four relation views, tiered aging and multilingual segmentation; zero network at runtime</title>
       <rect class="card" x="432" y="336" width="160" height="64" rx="3"/>
       <text class="kind" x="444" y="352">ON-DEVICE</text>
       <text class="name" x="444" y="372">memo</text>
-      <text class="meta" x="444" y="387">SQLite FTS5 + cosine</text>
-      <text class="sub2" x="444" y="397">zero network · 4 relations</text>
+      <text class="meta" x="444" y="387">FTS5 BM25 + cosine</text>
+      <text class="sub2" x="444" y="397">hybrid · 4 relations · offline</text>
     </g>
 
     <!-- 04 inference and routing -->
